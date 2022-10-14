@@ -36,8 +36,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          name: alsonchang/demo-argocd-kustomize
+          repository: alsonchang/demo-argocd-kustomize
           token: ${{ github.token }}
           path: argocd-kustomize
       - run: |
-          ls -al
+          ls -al argocd-kustomize
