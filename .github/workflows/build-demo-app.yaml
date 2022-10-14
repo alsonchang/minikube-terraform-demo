@@ -12,6 +12,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - uses: benjlevesque/short-sha@v1.2
+        id: short-sha
+        with:
+          length: 6
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
@@ -28,7 +33,7 @@ jobs:
         with:
           context: "{{defaultContext}}:bezkoder-app"
           push: true
-          tags: alsonchang/nodejsapp:latest, alsonchang/nodejsapp:${{ github.sha }}
+          tags: alsonchang/nodejsapp:latest, alsonchang/nodejsapp:${{ steps.short-sha.outputs.sha }}
 
       - name: Customize The Kubernetes deploy
         uses: imranismail/setup-kustomize@v1
@@ -41,7 +46,7 @@ jobs:
           path: argocd-kustomize
       - run: |
           cd argocd-kustomize/kustomize/demo-app
-          kustomize edit set image ${{ secrets.DOCKERHUB_USERNAME }}/nodejsapp=${{ secrets.DOCKERHUB_USERNAME }}/nodejsapp:${{ github.sha }}
+          kustomize edit set image ${{ secrets.DOCKERHUB_USERNAME }}/nodejsapp=${{ secrets.DOCKERHUB_USERNAME }}/nodejsapp:${{ steps.short-sha.outputs.sha }}
           kustomize build . > app-deployment.yaml
           cat app-deployment.yaml
           git config user.name alsonchang
