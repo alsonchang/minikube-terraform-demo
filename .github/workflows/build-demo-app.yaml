@@ -29,3 +29,7 @@ jobs:
           context: "{{defaultContext}}:bezkoder-app"
           push: true
           tags: alsonchang/nodejsapp:latest, alsonchang/nodejsapp:${{ github.sha }}
+      - name: Customize The Kubernetes deploy
+        uses: imranismail/setup-kustomize@v1
+        run: |
+          kustomize version
