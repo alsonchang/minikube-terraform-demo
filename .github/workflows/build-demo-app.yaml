@@ -52,3 +52,5 @@ jobs:
           git config user.name alsonchang
           git config user.email alson.chang@gmail.com
           git add app-deployment.yaml
+          git commit -m "Update image by ${GITHUB_REPOSITORY}, commit SHA ${{ steps.short-sha.outputs.sha }}"
+          git push
