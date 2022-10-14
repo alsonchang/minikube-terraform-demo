@@ -47,10 +47,9 @@ jobs:
       - run: |
           cd argocd-kustomize/kustomize/demo-app
           kustomize edit set image ${{ secrets.DOCKERHUB_USERNAME }}/nodejsapp=${{ secrets.DOCKERHUB_USERNAME }}/nodejsapp:${{ steps.short-sha.outputs.sha }}
-          kustomize build . -o app-deployment.yaml
-          cat app-deployment.yaml
+          kustomize build -o ./deployed/demo-app.yaml
           git config user.name alsonchang
           git config user.email alson.chang@gmail.com
-          git add app-deployment.yaml
+          git add ./deployed/demo-app.yaml
           git commit -m "Update image by ${GITHUB_REPOSITORY}, commit SHA ${{ steps.short-sha.outputs.sha }}"
           git push
