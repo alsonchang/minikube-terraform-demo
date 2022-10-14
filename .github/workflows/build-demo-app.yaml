@@ -28,7 +28,7 @@ jobs:
         with:
           context: "{{defaultContext}}:bezkoder-app"
           push: true
-          tags: alsonchang/nodejsapp:latest, alsonchang/nodejsapp:${{ github.sha::10 }}
+          tags: alsonchang/nodejsapp:latest, alsonchang/nodejsapp:${{ github.sha::7 }}
 
       - name: Customize The Kubernetes deploy
         uses: imranismail/setup-kustomize@v1
@@ -41,7 +41,7 @@ jobs:
           path: argocd-kustomize
       - run: |
           cd argocd-kustomize/kustomize/demo-app
-          kustomize edit set image ${{ secrets.DOCKERHUB_USERNAME }}/nodejsapp=${{ secrets.DOCKERHUB_USERNAME }}/nodejsapp:${{ github.sha::10 }}
+          kustomize edit set image ${{ secrets.DOCKERHUB_USERNAME }}/nodejsapp=${{ secrets.DOCKERHUB_USERNAME }}/nodejsapp:${{ github.sha::7 }}
           kustomize build . > app-deployment.yaml
           cat app-deployment.yaml
           git config user.name alsonchang
