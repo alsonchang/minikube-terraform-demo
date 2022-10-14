@@ -12,9 +12,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Add SHORT_SHA env property with commit short sha
-        run: echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_EN
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
@@ -31,7 +28,7 @@ jobs:
         with:
           context: "{{defaultContext}}:bezkoder-app"
           push: true
-          tags: alsonchang/nodejsapp:latest, alsonchang/nodejsapp:${SHORT_SHA}
+          tags: alsonchang/nodejsapp:latest, alsonchang/nodejsapp:${{ github.sha }}
 
       - name: Customize The Kubernetes deploy
         uses: imranismail/setup-kustomize@v1
@@ -44,7 +41,7 @@ jobs:
           path: argocd-kustomize
       - run: |
           cd argocd-kustomize/kustomize/demo-app
-          kustomize edit set image ${{ secrets.DOCKERHUB_USERNAME }}/nodejsapp=${{ secrets.DOCKERHUB_USERNAME }}/nodejsapp:${SHORT_SHA}
+          kustomize edit set image ${{ secrets.DOCKERHUB_USERNAME }}/nodejsapp=${{ secrets.DOCKERHUB_USERNAME }}/nodejsapp:${{ github.sha }}
           kustomize build . > app-deployment.yaml
           cat app-deployment.yaml
           git config user.name alsonchang
