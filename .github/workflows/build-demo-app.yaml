@@ -33,11 +33,13 @@ jobs:
       - name: Customize The Kubernetes deploy
         uses: imranismail/setup-kustomize@v1
 
-      - name: Checkout
+      - name: Checkout the kustomize repository
         uses: actions/checkout@v3
         with:
           repository: alsonchang/demo-argocd-kustomize
           token: ${{ github.token }}
           path: argocd-kustomize
       - run: |
-          ls -al argocd-kustomize
+          cd argocd-kustomize/kustomize/demo-app
+          kustomize edit set image ${{ secrets.DOCKERHUB_USERNAME }}/nodejsapp=${{ secrets.DOCKERHUB_USERNAME }}/nodejsapp:${{ github.sha }}
+          kustomize build . > app-deployment.yaml
