@@ -29,7 +29,15 @@ jobs:
           context: "{{defaultContext}}:bezkoder-app"
           push: true
           tags: alsonchang/nodejsapp:latest, alsonchang/nodejsapp:${{ github.sha }}
+
       - name: Customize The Kubernetes deploy
         uses: imranismail/setup-kustomize@v1
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          name: alsonchang/demo-argocd-kustomize
+          token: ${{ github.token }}
+          path: argocd-kustomize
       - run: |
-          kustomize version
+          ls -al
