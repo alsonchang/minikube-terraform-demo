@@ -31,5 +31,5 @@ jobs:
           tags: alsonchang/nodejsapp:latest, alsonchang/nodejsapp:${{ github.sha }}
       - name: Customize The Kubernetes deploy
         uses: imranismail/setup-kustomize@v1
-        run: |
+      - run: |
           kustomize version
