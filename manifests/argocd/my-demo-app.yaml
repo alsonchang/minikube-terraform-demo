@@ -8,9 +8,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/alsonchang/minikube-terraform-demo
+    repoURL: https://github.com/alsonchang/demo-argocd-kustomize
     targetRevision: HEAD
-    path: manifests/demo-app
+    path: kustomize/demo-app/deployed
   destination:
     server: https://kubernetes.default.svc
     namespace: demo
