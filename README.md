@@ -1,51 +1,134 @@
-# Docker Compose Nodejs and MySQL example
+# Minikube Terraform demo
+## Pre-requisiet
+The following commands must be installed in advance   
+[minikube](https://minikube.sigs.k8s.io/docs/start/)   
+[kubectl](https://kubernetes.io/docs/reference/kubectl/)   
+[terraform](https://learn.hashicorp.com/collections/terraform/cli)
 
-## Run the System
-We can easily run the whole with only a single command:
+## Run the minikube cluster
+We can create a minikube cluster with a single command
+
 ```bash
-docker-compose up
+minikube start
+```
+Interact with your cluster   
+
+```bash
+kubectl get pods -A
 ```
 
-Docker will pull the MySQL and Node.js images (if our machine does not have it before).
+Alternatively, minikube can download the appropriate version of kubectl and you should be able to use it like this:
 
-The services can be run on the background with command:
 ```bash
-docker-compose up -d
+minikube kubectl -- get pods -A
 ```
 
-## Stop the System
-Stopping all the running containers is also simple with a single command:
+If you don't need the minikube environment temporarily you can stop and suspend the virtual machines of the kubernests node    
+
 ```bash
-docker-compose down
+minikuebe stop
 ```
 
-If you need to stop and remove all containers, networks, and all images used by any service in <em>docker-compose.yml</em> file, use the command:
+When you are done testing and go to clean everything up, you can use the delete command to delete the minikube cluster.
+
 ```bash
-docker-compose down --rmi all
+minikube delete
 ```
 
-For more detail, please visit:
-> [Dockerize Node.js Express and MySQL example - Docker Compose](https://www.bezkoder.com/docker-compose-nodejs-mysql/)
+## Runing the terraform command to setup cluster
 
-Related Posts:
-> [Build Node.js Rest APIs with Express & MySQL](https://www.bezkoder.com/node-js-rest-api-express-mysql/)
+When kubernetes cluster is ready for access , you can running terraforom command to setup cluster.   
 
-> [Upload/store images in MySQL using Node.js, Express & Multer](https://www.bezkoder.com/node-js-upload-image-mysql/)
+Initialize the Terraform project. When you run the terraform project for the first time, you need to initialize it first. When you execute the init command, terraform will download the required plugins and create the .lock.hcl file to keep track of the plugin versions.   
 
-> [Node.js: Upload CSV file data into Database with Express](https://bezkoder.com/node-js-upload-csv-file-database/)
+```bash
+cd ./terraform
+terraform init
+```
 
-> [Node.js: Upload Excel file data into Database with Express](https://www.bezkoder.com/node-js-upload-excel-file-database/)
+Terraform plan, The terraform plan command creates an execution plan, which lets you preview the changes that Terraform plans to make to your infrastructure.   
 
-> [Build Node.js Rest APIs with Express, Sequelize & MySQL](https://bezkoder.com/node-js-express-sequelize-mysql/)
+```bash
+terraform plan
+```
 
-> [Server side Pagination in Node.js with Sequelize and MySQL](https://bezkoder.com/node-js-sequelize-pagination-mysql/)
+Terraform apply, The terraform apply command executes the actions proposed in a Terraform plan.   
 
-> [Deploying/Hosting Node.js app on Heroku with MySQL database](https://bezkoder.com/deploy-node-js-app-heroku-cleardb-mysql/)
+```bash
+terraform apply
+```
 
-Security:
-> [Node.js Express: JWT example | Token Based Authentication & Authorization](https://bezkoder.com/node-js-jwt-authentication-mysql/)
+Terraform destory, The terraform destroy command is a convenient way to destroy all remote objects managed by a particular Terraform configuration.   
 
-Associations:
-> [Sequelize Associations: One-to-Many Relationship example](https://bezkoder.com/sequelize-associate-one-to-many/)
+```bash
+terraform destroy
+```
 
-> [Sequelize Associations: Many-to-Many Relationship example](https://bezkoder.com/sequelize-associate-many-to-many/)
+## ArgoCD
+
+When you initilize and apply terraform configurtion, the terraform will create the ArcoCD applicaition, which is an gitops tools it can help keeping the application in kubernetes setup as code , you can specify the github repository as the application configuration repository, then ArgoCD will continuously track configuration changes in the repository and apply them.   
+
+Access ArgoCD service, you can using get svc command to get service IP   
+
+```bash
+kubectl -n argocd get svc
+```
+
+Then, you can copy the IP of argocd-server and paste it into your browser to access it.
+
+Retrive the default password, You can run the following command to get the default admin password  
+
+```bash
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -D
+```
+
+
+## Update demo application
+The demo repository includes a github action workflow to build a docker image of the application and place it on the docker hub, then update the base of the ArgoCD configuration repository.   
+You can see the details of setup in workflows config file ```./.github/workflows/build-demo-app.yaml```
+
+## Access the demo application
+You can use the kubectl get svc command to get the external ip of the demo-app to access the application on the open port 6868.   
+
+```bash
+kubectl -n demo get svc
+```
+
+When you use minikube as a cluster provider, you should first perform a ```minikube tunnel``` to enable the mapping of application IPs.
+
+
+### demo-app endpoint:   
+List all of records
+
+```bash
+curl --location --request GET 'http://[demo-service-ip]:6868/api/tutorials'
+```
+Add a record   
+
+```bash
+curl --location --request POST 'http://[demo-service-ip]:6868/api/tutorials' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "title": "Demo1",
+    "description": "Demo1 description"
+}'
+```
+
+Update the record   
+
+```bash
+curl --location --request PUT 'http://[demo-service-ip]:6868/api/tutorials/1' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "title": "DemoUpdate",
+    "description": "DemoUpdate description"
+}'
+```
+
+Delete the record   
+
+```bash
+curl --location --request DELETE 'http://[demo-service-ip]:6868/api/tutorials/1' \
+--header 'Content-Type: application/json'
+```
+
