@@ -26,7 +26,7 @@ db.sequelize.sync({ force: true }).then(() => {
 
 // simple route
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to demo1 application." });
+  res.json({ message: "Welcome to wemodemo application." });
 });
 
 require("./app/routes/turorial.routes")(app);
